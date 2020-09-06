@@ -1,0 +1,6 @@
+(
+  title: "Rust Chess",
+  dimensions: Some((1770, 1000)),
+  max_dimensions: Some((1770, 1000)),
+  min_dimensions: Some((1770, 1000)),
+)
