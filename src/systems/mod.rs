@@ -1,3 +1,7 @@
 mod animation;
+mod physics;
 
-pub use self::animation::SpriteAnimationSystem;
+pub use self::{
+    animation::SpriteAnimationSystem,
+    physics::{PhysicsSystem, PositionSystem},
+};
