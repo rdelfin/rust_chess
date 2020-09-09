@@ -9,13 +9,8 @@ use tuple_map::*;
 
 #[derive(Hash, Eq, PartialEq, Debug)]
 pub enum SpriteKey {
-    TransitCar,
-    RoadTile,
-    AnimatedRoadTile,
-    Car(u32),
-    Digits,
-    SplashAnimation,
-    Selector,
+    Pieces,
+    Board,
 }
 
 pub struct SpriteCache {
@@ -37,13 +32,8 @@ impl SpriteCache {
 
     pub fn load(&mut self, sprite_key: SpriteKey, world: &mut World) {
         let base_path = match &sprite_key {
-            SpriteKey::TransitCar => "transito".to_string(),
-            SpriteKey::RoadTile => "road_tile".to_string(),
-            SpriteKey::AnimatedRoadTile => "road_tile_animated".to_string(),
-            SpriteKey::Car(idx) => format!("car{}", idx),
-            SpriteKey::Digits => "numbers".to_string(),
-            SpriteKey::SplashAnimation => "gmtk_ss".to_string(),
-            SpriteKey::Selector => "target".to_string(),
+            SpriteKey::Pieces => "all_pieces".to_string(),
+            SpriteKey::Board => "board".to_string(),
         };
 
         let (img_path, ron_path) = ("png", "ron").map(|ext| {
