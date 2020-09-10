@@ -1,3 +1,7 @@
+use crate::{
+    entities::pieces,
+    resources::{SpriteCache, SpriteKey},
+};
 use amethyst::{
     core::transform::Transform,
     input::{is_close_requested, is_key_down, VirtualKeyCode},
@@ -5,8 +9,7 @@ use amethyst::{
     renderer::Camera,
     window::ScreenDimensions,
 };
-
-use log::info;
+use anyhow::Result;
 
 /// A dummy game state that shows 3 sprites.
 pub struct GameState;
@@ -20,8 +23,14 @@ impl SimpleState for GameState {
         // pass the world mutably to the following functions.
         let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
 
+        // Load sprites into memory
+        self.load_sprites(world);
+
         // Place the camera
         self.init_camera(world, &dimensions);
+
+        // Setup board
+        self.init_board(world).unwrap();
     }
 
     fn handle_event(
@@ -55,5 +64,18 @@ impl GameState {
             .with(Camera::standard_2d(dimensions.width(), dimensions.height()))
             .with(transform)
             .build();
+    }
+
+    fn load_sprites(&self, world: &mut World) {
+        let mut sprite_cache = SpriteCache::new();
+        sprite_cache.load(SpriteKey::Board, world);
+        sprite_cache.load(SpriteKey::Pieces, world);
+        world.insert(sprite_cache);
+    }
+
+    fn init_board(&self, world: &mut World) -> Result<()> {
+        pieces::new_piece(world, pieces::ChessPiece::King, pieces::ChessColor::Black)?;
+
+        Ok(())
     }
 }
