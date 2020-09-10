@@ -43,7 +43,7 @@ pub fn new_piece(world: &mut World, chess_piece: ChessPiece, color: ChessColor) 
         })
         .with(Transparent)
         .with(Transform::default())
-        .with(Position(Vector2::new(0., 0.)))
+        .with(Position(Vector2::new(-224., 224.)))
         .with(Velocity(Vector2::new(0., 0.)))
         .build())
 }
