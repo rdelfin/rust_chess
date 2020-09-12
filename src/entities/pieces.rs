@@ -1,5 +1,5 @@
 use crate::{
-    components::{Position, Velocity},
+    components::{PiecePlacement, Position, Velocity},
     resources::{SpriteCache, SpriteKey},
 };
 use amethyst::{
@@ -43,8 +43,9 @@ pub fn new_piece(world: &mut World, chess_piece: ChessPiece, color: ChessColor) 
         })
         .with(Transparent)
         .with(Transform::default())
-        .with(Position(Vector2::new(-224., 224.)))
+        .with(Position(Vector2::new(0., 0.)))
         .with(Velocity(Vector2::new(0., 0.)))
+        .with(PiecePlacement(Vector2::new(2, 3)))
         .build())
 }
 

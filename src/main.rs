@@ -41,11 +41,12 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderUi::default())
                 .with_plugin(RenderFlat2D::default()),
         )?
+        .with(systems::PiecePlacementSystem, "piece_placement_system", &[])
         .with(systems::PhysicsSystem, "physics_system", &[])
         .with(
             systems::PositionSystem,
             "position_system",
-            &["physics_system"],
+            &["physics_system", "piece_placement_system"],
         )
         .with(
             systems::SpriteAnimationSystem,
