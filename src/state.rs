@@ -75,8 +75,7 @@ impl GameState {
     }
 
     fn init_board(&self, world: &mut World) -> Result<()> {
-        board::new_board(world)?;
-        pieces::new_piece(world, ChessPiece::King, ChessColor::Black)?;
+        board::new_full_board(world)?;
 
         world.insert(Play {
             turn: ChessColor::White,
