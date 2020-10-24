@@ -1,5 +1,5 @@
 use crate::{
-    components::{PiecePlacement, Position, Velocity},
+    components::{ChessPieceInfo, PiecePlacement, Position, Velocity},
     resources::{SpriteCache, SpriteKey},
     utils::{ChessColor, ChessPiece},
 };
@@ -12,7 +12,7 @@ use amethyst::{
 use anyhow::{anyhow, Result};
 use nalgebra::Vector2;
 
-pub fn new_piece(world: &mut World, chess_piece: ChessPiece, color: ChessColor) -> Result<Entity> {
+pub fn new_piece(world: &mut World, piece: ChessPiece, color: ChessColor) -> Result<Entity> {
     let piece_handle = {
         let sprite_cache = world
             .try_fetch::<SpriteCache>()
@@ -24,13 +24,14 @@ pub fn new_piece(world: &mut World, chess_piece: ChessPiece, color: ChessColor) 
         .create_entity()
         .with(SpriteRender {
             sprite_sheet: piece_handle,
-            sprite_number: chess_piece_to_frame(chess_piece, color),
+            sprite_number: chess_piece_to_frame(piece, color),
         })
         .with(Transparent)
         .with(Transform::default())
         .with(Position(Vector2::new(0., 0.)))
         .with(Velocity(Vector2::new(0., 0.)))
         .with(PiecePlacement(Vector2::new(2, 3)))
+        .with(ChessPieceInfo { color, piece })
         .build())
 }
 
