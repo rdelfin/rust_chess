@@ -1,6 +1,6 @@
 use crate::{
     entities::{board, pieces},
-    resources::{SpriteCache, SpriteKey},
+    resources::{PiecePositioning, SpriteCache, SpriteKey},
     utils::{ChessColor, ChessPiece},
 };
 use amethyst::{
@@ -77,6 +77,8 @@ impl GameState {
     fn init_board(&self, world: &mut World) -> Result<()> {
         board::new_board(world)?;
         pieces::new_piece(world, ChessPiece::King, ChessColor::Black)?;
+
+        world.insert(PiecePositioning::default());
 
         Ok(())
     }

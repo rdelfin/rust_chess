@@ -1,3 +1,4 @@
+mod play;
 mod sprite_cache;
 
 pub use self::{
