@@ -1,3 +1,6 @@
 mod sprite_cache;
 
-pub use self::sprite_cache::{SpriteCache, SpriteKey};
+pub use self::{
+    play::{PiecePositioning, Play},
+    sprite_cache::{SpriteCache, SpriteKey},
+};

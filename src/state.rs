@@ -1,6 +1,7 @@
 use crate::{
     entities::{board, pieces},
     resources::{SpriteCache, SpriteKey},
+    utils::{ChessColor, ChessPiece},
 };
 use amethyst::{
     core::transform::Transform,
@@ -75,7 +76,7 @@ impl GameState {
 
     fn init_board(&self, world: &mut World) -> Result<()> {
         board::new_board(world)?;
-        pieces::new_piece(world, pieces::ChessPiece::King, pieces::ChessColor::Black)?;
+        pieces::new_piece(world, ChessPiece::King, ChessColor::Black)?;
 
         Ok(())
     }

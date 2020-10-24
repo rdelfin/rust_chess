@@ -1,6 +1,7 @@
 use crate::{
     components::{PiecePlacement, Position, Velocity},
     resources::{SpriteCache, SpriteKey},
+    utils::{ChessColor, ChessPiece},
 };
 use amethyst::{
     core::Transform,
@@ -10,22 +11,6 @@ use amethyst::{
 };
 use anyhow::{anyhow, Result};
 use nalgebra::Vector2;
-
-#[derive(Clone, Copy)]
-pub enum ChessPiece {
-    Pawn,
-    Rook,
-    Horse,
-    Bishop,
-    Queen,
-    King,
-}
-
-#[derive(Clone, Copy)]
-pub enum ChessColor {
-    White,
-    Black,
-}
 
 pub fn new_piece(world: &mut World, chess_piece: ChessPiece, color: ChessColor) -> Result<Entity> {
     let piece_handle = {
