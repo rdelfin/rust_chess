@@ -13,6 +13,7 @@ use amethyst::{
 
 mod components;
 mod entities;
+mod input;
 mod resources;
 mod state;
 mod systems;
@@ -30,7 +31,8 @@ fn main() -> amethyst::Result<()> {
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(
-            InputBundle::<StringBindings>::new().with_bindings_from_file(&key_bindings_path)?,
+            InputBundle::<input::ControlBindingTypes>::new()
+                .with_bindings_from_file(&key_bindings_path)?,
         )?
         .with_bundle(UiBundle::<StringBindings>::new())?
         .with_bundle(
@@ -53,6 +55,11 @@ fn main() -> amethyst::Result<()> {
             systems::SpriteAnimationSystem,
             "sprite_animation_system",
             &[],
+        )
+        .with(
+            systems::UserInputSystem,
+            "user_input_system",
+            &["position_system", "input_system"],
         );
 
     let mut game = Application::new(resources, state::GameState, game_data)?;
