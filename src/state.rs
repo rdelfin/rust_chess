@@ -79,6 +79,7 @@ impl GameState {
 
         world.insert(Play {
             turn: ChessColor::White,
+            selected_piece: None,
         });
         world.insert(PiecePositioning::default());
 
