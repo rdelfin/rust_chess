@@ -1,4 +1,7 @@
-use crate::{input::ControlBindingTypes, resources::PiecePositioning};
+use crate::{
+    input::{ActionBinding, ControlBindingTypes},
+    resources::{PiecePositioning, Selected},
+};
 use amethyst::{
     core::{
         geometry::Plane,
@@ -6,7 +9,7 @@ use amethyst::{
         transform::Transform,
     },
     derive::SystemDesc,
-    ecs::{prelude::*, Entities, Read, ReadExpect, System},
+    ecs::{prelude::*, Entities, Read, ReadExpect, System, Write},
     input::InputHandler,
     renderer::camera::{ActiveCamera, Camera},
     window::ScreenDimensions,
@@ -25,11 +28,21 @@ impl<'s> System<'s> for UserInputSystem {
         ReadStorage<'s, Camera>,
         Read<'s, ActiveCamera>,
         ReadExpect<'s, ScreenDimensions>,
+        Write<'s, Selected>,
     );
 
     fn run(
         &mut self,
-        (entities, input, piece_positioning, transforms, cameras, active_camera, screen_dimensions): Self::SystemData,
+        (
+            entities,
+            input,
+            piece_positioning,
+            transforms,
+            cameras,
+            active_camera,
+            screen_dimensions,
+            mut selected,
+        ): Self::SystemData,
     ) {
         let mouse = match input.mouse_position() {
             Some((x, y)) => Point2::new(x, y),
@@ -49,8 +62,18 @@ impl<'s> System<'s> for UserInputSystem {
                 camera_transform,
             );
             let distance = ray.intersect_plane(&Plane::with_z(0.0)).unwrap();
-            let mouse_world_position = ray.at_distance(distance);
-            println!("Mouse: {}", mouse_world_position);
+            let mouse_pos = ray.at_distance(distance);
+            let chess_pos = Vector2::new(
+                ((mouse_pos.x + 192.) / 64.).ceil() as i32,
+                ((-mouse_pos.y + 192.) / 64.).ceil() as i32,
+            );
+
+            if input
+                .action_is_down(&ActionBinding::Select)
+                .unwrap_or(false)
+            {
+                selected.0 = piece_positioning.map.get(&chess_pos).cloned();
+            }
         }
     }
 }

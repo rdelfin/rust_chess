@@ -1,7 +1,7 @@
 use crate::{
-    entities::{board, pieces},
-    resources::{PiecePositioning, Play, SpriteCache, SpriteKey},
-    utils::{ChessColor, ChessPiece},
+    entities::board,
+    resources::{PiecePositioning, Play, Selected, SpriteCache, SpriteKey},
+    utils::ChessColor,
 };
 use amethyst::{
     core::transform::Transform,
@@ -82,6 +82,7 @@ impl GameState {
             selected_piece: None,
         });
         world.insert(PiecePositioning::default());
+        world.insert(Selected::default());
 
         Ok(())
     }
