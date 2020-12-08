@@ -57,7 +57,7 @@ fn main() -> amethyst::Result<()> {
             &[],
         )
         .with(
-            systems::UserInputSystem,
+            systems::UserInputSystem::default(),
             "user_input_system",
             &["position_system", "input_system"],
         );

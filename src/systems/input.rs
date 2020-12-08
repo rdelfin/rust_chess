@@ -16,8 +16,10 @@ use amethyst::{
 };
 use nalgebra::{Point2, Vector2};
 
-#[derive(SystemDesc)]
-pub struct UserInputSystem;
+#[derive(SystemDesc, Default)]
+pub struct UserInputSystem {
+    select_prev_pressed: bool,
+}
 
 impl<'s> System<'s> for UserInputSystem {
     type SystemData = (
@@ -48,6 +50,9 @@ impl<'s> System<'s> for UserInputSystem {
             Some((x, y)) => Point2::new(x, y),
             None => Point2::new(0.0, 0.0),
         };
+        let selected_pressed = input
+            .action_is_down(&ActionBinding::Select)
+            .unwrap_or(false);
 
         let mut camera_join = (&cameras, &transforms).join();
         if let Some((camera, camera_transform)) = active_camera
@@ -68,12 +73,11 @@ impl<'s> System<'s> for UserInputSystem {
                 ((-mouse_pos.y + 192.) / 64.).ceil() as i32,
             );
 
-            if input
-                .action_is_down(&ActionBinding::Select)
-                .unwrap_or(false)
-            {
+            if !selected_pressed && self.select_prev_pressed {
                 selected.0 = piece_positioning.map.get(&chess_pos).cloned();
             }
         }
+
+        self.select_prev_pressed = selected_pressed;
     }
 }
