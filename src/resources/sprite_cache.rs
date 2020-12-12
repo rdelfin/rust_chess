@@ -11,6 +11,7 @@ use tuple_map::*;
 pub enum SpriteKey {
     Pieces,
     Board,
+    OptionSquare,
 }
 
 pub struct SpriteCache {
@@ -34,6 +35,7 @@ impl SpriteCache {
         let base_path = match &sprite_key {
             SpriteKey::Pieces => "all_pieces",
             SpriteKey::Board => "board",
+            SpriteKey::OptionSquare => "option_square",
         };
 
         let (img_path, ron_path) = ("png", "ron").map(|ext| {
