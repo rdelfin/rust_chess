@@ -1,3 +1,3 @@
 mod pieces;
 
-pub use self::pieces::{ChessColor, ChessPiece};
+pub use self::pieces::{valid_piece_movements, ChessColor, ChessPiece};
