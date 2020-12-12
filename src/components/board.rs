@@ -12,3 +12,9 @@ pub struct ChessPieceInfo {
     pub color: ChessColor,
     pub piece: ChessPiece,
 }
+
+#[derive(Debug, Component)]
+#[storage(DenseVecStorage)]
+pub struct PotentialMovement {
+    pub pos: Vector2<i32>,
+}

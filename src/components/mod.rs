@@ -3,7 +3,7 @@ mod physics;
 mod sprite;
 
 pub use self::{
-    board::{ChessPieceInfo, PiecePlacement},
+    board::{ChessPieceInfo, PiecePlacement, PotentialMovement},
     physics::{Position, Velocity},
     sprite::AnimatedSprite,
 };
