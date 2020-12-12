@@ -1,6 +1,6 @@
 use crate::{
     components::{ChessPieceInfo, PiecePlacement, Position},
-    resources::PiecePositioning,
+    resources::{Displayed, PiecePositioning, Selected},
 };
 use amethyst::{
     derive::SystemDesc,
@@ -33,5 +33,30 @@ impl<'s> System<'s> for PiecePlacementSystem {
                 + 64. * Vector2::new(piece_placement.0.x as f32, -piece_placement.0.y as f32);
             piece_positioning.map.insert(piece_placement.0, entity);
         }
+    }
+}
+
+#[derive(SystemDesc)]
+pub struct MovementSystem;
+
+impl<'s> System<'s> for MovementSystem {
+    type SystemData = (
+        Write<'s, Selected>,
+        Write<'s, Displayed>,
+        Read<'s, PiecePositioning>,
+    );
+
+    fn run(&mut self, (mut selected, mut displayed, piece_positioning): Self::SystemData) {
+        if let Some(s) = selected.0 {
+            displayed.0 = match displayed.0 {
+                Some(d) => {
+                    // Move the piece if it's a valid movement
+                    None
+                }
+                None => piece_positioning.map.get(&s).cloned(),
+            };
+        }
+
+        selected.0 = None
     }
 }

@@ -25,7 +25,6 @@ impl<'s> System<'s> for UserInputSystem {
     type SystemData = (
         Entities<'s>,
         Read<'s, InputHandler<ControlBindingTypes>>,
-        Read<'s, PiecePositioning>,
         ReadStorage<'s, Transform>,
         ReadStorage<'s, Camera>,
         Read<'s, ActiveCamera>,
@@ -38,7 +37,6 @@ impl<'s> System<'s> for UserInputSystem {
         (
             entities,
             input,
-            piece_positioning,
             transforms,
             cameras,
             active_camera,
@@ -73,11 +71,15 @@ impl<'s> System<'s> for UserInputSystem {
                 ((-mouse_pos.y + 192.) / 64.).ceil() as i32,
             );
 
-            if !selected_pressed && self.select_prev_pressed {
-                selected.0 = piece_positioning.map.get(&chess_pos).cloned();
+            if !selected_pressed && self.select_prev_pressed && inside_board(chess_pos) {
+                selected.0 = Some(chess_pos);
             }
         }
 
         self.select_prev_pressed = selected_pressed;
     }
+}
+
+fn inside_board(p: Vector2<i32>) -> bool {
+    p.x >= 0 && p.y >= 0 && p.x < 8 && p.y < 8
 }

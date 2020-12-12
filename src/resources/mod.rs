@@ -4,6 +4,6 @@ mod sprite_cache;
 
 pub use self::{
     play::{PiecePositioning, Play},
-    selected::Selected,
+    selected::{Displayed, Selected},
     sprite_cache::{SpriteCache, SpriteKey},
 };
