@@ -32,13 +32,13 @@ impl SpriteCache {
 
     pub fn load(&mut self, sprite_key: SpriteKey, world: &mut World) {
         let base_path = match &sprite_key {
-            SpriteKey::Pieces => "all_pieces".to_string(),
-            SpriteKey::Board => "board".to_string(),
+            SpriteKey::Pieces => "all_pieces",
+            SpriteKey::Board => "board",
         };
 
         let (img_path, ron_path) = ("png", "ron").map(|ext| {
             let mut path = PathBuf::from("sprites");
-            path.push(&base_path);
+            path.push(base_path);
             path.set_extension(ext);
             path.as_path().to_str().unwrap_or("").to_string()
         });
