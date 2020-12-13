@@ -65,7 +65,20 @@ pub fn rook_movements(
     color: ChessColor,
     all_pieces: &HashMap<Vector2<i32>, ChessColor>,
 ) -> HashSet<Vector2<i32>> {
-    let movements = HashSet::new();
+    let mut movements = HashSet::new();
+
+    movements.extend(
+        (0..8)
+            .map(|r| Vector2::new(r, pos.y))
+            .filter(|p| *p != pos && empty_between(pos, *p, all_pieces, true, false)),
+    );
+
+    movements.extend(
+        (0..8)
+            .map(|r| Vector2::new(pos.x, r))
+            .filter(|p| *p != pos && empty_between(pos, *p, all_pieces, true, false)),
+    );
+
     movements
 }
 
