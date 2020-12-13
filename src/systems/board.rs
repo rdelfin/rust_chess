@@ -1,6 +1,8 @@
 use crate::{
-    components::{ChessPieceInfo, PiecePlacement, Position},
-    resources::{Displayed, PiecePositioning, Selected},
+    components::{ChessPieceInfo, PiecePlacement, Position, PotentialMovement},
+    entities::display as display_entities,
+    resources::{Displayed, PiecePositioning, Selected, SpriteCache},
+    utils::valid_piece_movements,
 };
 use amethyst::{
     derive::SystemDesc,
@@ -26,7 +28,7 @@ impl<'s> System<'s> for PiecePlacementSystem {
         (piece_placements, piece_infos, mut positions, mut piece_positioning, entities): Self::SystemData,
     ) {
         piece_positioning.map.clear();
-        for (piece_placement, piece_info, position, entity) in
+        for (piece_placement, _, position, entity) in
             (&piece_placements, &piece_infos, &mut positions, &entities).join()
         {
             position.0 = Vector2::new(-224., 224.)
@@ -44,16 +46,65 @@ impl<'s> System<'s> for MovementSystem {
         Write<'s, Selected>,
         Write<'s, Displayed>,
         Read<'s, PiecePositioning>,
+        ReadStorage<'s, ChessPieceInfo>,
+        ReadStorage<'s, PotentialMovement>,
+        Entities<'s>,
+        Read<'s, LazyUpdate>,
+        Read<'s, SpriteCache>,
     );
 
-    fn run(&mut self, (mut selected, mut displayed, piece_positioning): Self::SystemData) {
+    fn run(
+        &mut self,
+        (
+            mut selected,
+            mut displayed,
+            piece_positioning,
+            piece_infos,
+            potential_movements,
+            entities,
+            lazy_update,
+            sprite_cache,
+        ): Self::SystemData,
+    ) {
         if let Some(s) = selected.0 {
+            let piece_info = piece_infos
+                .join()
+                .get(piece_positioning.map[&s], &entities)
+                .unwrap();
+            let mut piece_infos_join = piece_infos.join();
+            let colour_mappings = piece_positioning
+                .map
+                .iter()
+                .map(|(position, entity)| {
+                    (
+                        *position,
+                        piece_infos_join.get(*entity, &entities).unwrap().color,
+                    )
+                })
+                .collect();
+            let valid_moves = valid_piece_movements(s, piece_info.piece, &colour_mappings);
+
             displayed.0 = match displayed.0 {
-                Some(d) => {
-                    // Move the piece if it's a valid movement
+                Some(_) => {
+                    for (_, entity) in (&potential_movements, &entities).join() {
+                        entities.delete(entity).unwrap();
+                    }
                     None
                 }
-                None => piece_positioning.map.get(&s).cloned(),
+                None => {
+                    // If we're not already showing a move, add the selected piece's potential
+                    // moves
+                    for movement in valid_moves {
+                        display_entities::fill_potential_move(
+                            &entities,
+                            &lazy_update,
+                            &sprite_cache,
+                            movement,
+                        )
+                        .unwrap();
+                    }
+                    piece_positioning.map.get(&s).cloned()
+                }
             };
         }
 

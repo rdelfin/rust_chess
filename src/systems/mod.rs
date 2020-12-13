@@ -5,7 +5,7 @@ mod physics;
 
 pub use self::{
     animation::SpriteAnimationSystem,
-    board::PiecePlacementSystem,
+    board::{MovementSystem, PiecePlacementSystem},
     input::UserInputSystem,
     physics::{PhysicsSystem, PositionSystem},
 };

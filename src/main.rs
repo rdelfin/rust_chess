@@ -60,6 +60,11 @@ fn main() -> amethyst::Result<()> {
             systems::UserInputSystem::default(),
             "user_input_system",
             &["position_system", "input_system"],
+        )
+        .with(
+            systems::MovementSystem,
+            "piece_movement_system",
+            &["user_input_system", "position_system"],
         );
 
     let mut game = Application::new(resources, state::GameState, game_data)?;
