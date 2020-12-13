@@ -37,13 +37,9 @@ pub fn pawn_movements(
     );
 
     // candidates.1 contains initial double-jump
-    movements.extend(
-        candidates
-            .1
-            .iter()
-            .cloned()
-            .filter(|p| pos.y == start_row && empty_between(pos, *p, all_pieces, true, false)),
-    );
+    movements.extend(candidates.1.iter().cloned().filter(|p| {
+        pos.y == start_row && empty_between(pos, *p, all_pieces) && !all_pieces.contains_key(p)
+    }));
 
     // candidates.2 contains om nom nom
     movements.extend(
@@ -67,17 +63,13 @@ pub fn rook_movements(
 ) -> HashSet<Vector2<i32>> {
     let mut movements = HashSet::new();
 
-    movements.extend(
-        (0..8)
-            .map(|r| Vector2::new(r, pos.y))
-            .filter(|p| *p != pos && empty_between(pos, *p, all_pieces, true, false)),
-    );
+    movements.extend((0..8).map(|r| Vector2::new(r, pos.y)).filter(|p| {
+        *p != pos && empty_between(pos, *p, all_pieces) && empty_or_attack(p, color, all_pieces)
+    }));
 
-    movements.extend(
-        (0..8)
-            .map(|r| Vector2::new(pos.x, r))
-            .filter(|p| *p != pos && empty_between(pos, *p, all_pieces, true, false)),
-    );
+    movements.extend((0..8).map(|r| Vector2::new(pos.x, r)).filter(|p| {
+        *p != pos && empty_between(pos, *p, all_pieces) && empty_or_attack(p, color, all_pieces)
+    }));
 
     movements
 }
@@ -99,7 +91,7 @@ pub fn horse_movements(
     ]
     .iter()
     .map(|p| pos + Vector2::new(p.0, p.1))
-    .filter(|p| in_board(p) && (!all_pieces.contains_key(p) || all_pieces[p] != color))
+    .filter(|p| in_board(p) && empty_or_attack(p, color, all_pieces))
     .collect()
 }
 
@@ -110,16 +102,18 @@ pub fn bishop_movements(
 ) -> HashSet<Vector2<i32>> {
     let mut movements = HashSet::new();
 
-    movements.extend(
-        (-8..8).map(|r| pos + Vector2::new(r, r)).filter(|p| {
-            *p != pos && in_board(p) && empty_between(pos, *p, all_pieces, true, false)
-        }),
-    );
-    movements.extend(
-        (-8..8).map(|r| pos + Vector2::new(r, -r)).filter(|p| {
-            *p != pos && in_board(p) && empty_between(pos, *p, all_pieces, true, false)
-        }),
-    );
+    movements.extend((-8..8).map(|r| pos + Vector2::new(r, r)).filter(|p| {
+        *p != pos
+            && in_board(p)
+            && empty_between(pos, *p, all_pieces)
+            && empty_or_attack(p, color, all_pieces)
+    }));
+    movements.extend((-8..8).map(|r| pos + Vector2::new(r, -r)).filter(|p| {
+        *p != pos
+            && in_board(p)
+            && empty_between(pos, *p, all_pieces)
+            && empty_or_attack(p, color, all_pieces)
+    }));
 
     movements
 }
@@ -142,9 +136,7 @@ pub fn king_movements(
 ) -> HashSet<Vector2<i32>> {
     iproduct!((-1..2), (-1..2))
         .map(|(x, y)| pos + Vector2::new(x, y))
-        .filter(|p| {
-            *p != pos && in_board(p) && (!all_pieces.contains_key(p) || all_pieces[p] != color)
-        })
+        .filter(|p| *p != pos && in_board(p) && empty_or_attack(p, color, all_pieces))
         .collect()
 }
 
@@ -153,24 +145,20 @@ fn empty_between(
     start: Vector2<i32>,
     end: Vector2<i32>,
     all_pieces: &HashMap<Vector2<i32>, ChessColor>,
-    exclude_start: bool,
-    exclude_end: bool,
 ) -> bool {
     let diff = end - start;
-    let start_iter = if exclude_start { 1 } else { 0 };
-    let end_iter_offset = if exclude_end { 0 } else { 1 };
 
     // Generates the set of tiles we'll need to check (vertical, horizontal and diagnonal)
     let tiles = if diff.x == 0 {
-        (start_iter..(diff.y.abs() + end_iter_offset))
+        (1..diff.y.abs())
             .map(|i| start + i * Vector2::new(0, diff.y.signum()))
             .collect()
     } else if diff.y == 0 {
-        (start_iter..(diff.x.abs() + end_iter_offset))
+        (1..diff.x.abs())
             .map(|i| start + i * Vector2::new(diff.x.signum(), 0))
             .collect()
     } else if diff.x.abs() == diff.y.abs() {
-        (start_iter..(diff.x.abs() + end_iter_offset))
+        (1..diff.x.abs())
             .map(|i| start + i * Vector2::new(diff.x.signum(), diff.y.signum()))
             .collect()
     } else {
@@ -178,6 +166,14 @@ fn empty_between(
     };
 
     tiles.into_iter().all(|t| !all_pieces.contains_key(&t))
+}
+
+fn empty_or_attack(
+    pos: &Vector2<i32>,
+    color: ChessColor,
+    all_pieces: &HashMap<Vector2<i32>, ChessColor>,
+) -> bool {
+    !all_pieces.contains_key(pos) || all_pieces[pos] != color
 }
 
 fn in_board(pos: &Vector2<i32>) -> bool {
