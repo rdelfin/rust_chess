@@ -140,8 +140,12 @@ pub fn king_movements(
     color: ChessColor,
     all_pieces: &HashMap<Vector2<i32>, ChessColor>,
 ) -> HashSet<Vector2<i32>> {
-    let movements = HashSet::new();
-    movements
+    iproduct!((-1..2), (-1..2))
+        .map(|(x, y)| pos + Vector2::new(x, y))
+        .filter(|p| {
+            *p != pos && in_board(p) && (!all_pieces.contains_key(p) || all_pieces[p] != color)
+        })
+        .collect()
 }
 
 // Checks if every tile between start and end is populated
