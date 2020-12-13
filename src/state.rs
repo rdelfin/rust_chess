@@ -71,6 +71,7 @@ impl GameState {
         let mut sprite_cache = SpriteCache::new();
         sprite_cache.load(SpriteKey::Board, world);
         sprite_cache.load(SpriteKey::Pieces, world);
+        sprite_cache.load(SpriteKey::OptionSquare, world);
         world.insert(sprite_cache);
     }
 
