@@ -11,6 +11,9 @@ use amethyst::{
     utils::application_root_dir,
 };
 
+#[macro_use]
+extern crate itertools;
+
 mod components;
 mod entities;
 mod input;
