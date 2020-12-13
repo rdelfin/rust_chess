@@ -3,7 +3,7 @@ mod movements;
 use nalgebra::Vector2;
 use std::collections::{HashMap, HashSet};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ChessPiece {
     Pawn,
     Rook,
@@ -13,7 +13,7 @@ pub enum ChessPiece {
     King,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ChessColor {
     White,
     Black,
