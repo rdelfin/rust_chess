@@ -1,6 +1,6 @@
 use crate::{
     input::{ActionBinding, ControlBindingTypes},
-    resources::{PiecePositioning, Selected},
+    resources::Selected,
 };
 use amethyst::{
     core::{
@@ -22,6 +22,7 @@ pub struct UserInputSystem {
 }
 
 impl<'s> System<'s> for UserInputSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         Entities<'s>,
         Read<'s, InputHandler<ControlBindingTypes>>,

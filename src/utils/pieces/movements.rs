@@ -1,4 +1,4 @@
-use crate::utils::{ChessColor, ChessPiece};
+use crate::utils::ChessColor;
 use nalgebra::Vector2;
 use std::collections::{HashMap, HashSet};
 

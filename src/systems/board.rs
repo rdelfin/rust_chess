@@ -42,6 +42,7 @@ impl<'s> System<'s> for PiecePlacementSystem {
 pub struct MovementSystem;
 
 impl<'s> System<'s> for MovementSystem {
+    #[allow(clippy::type_complexity)]
     type SystemData = (
         Write<'s, Selected>,
         Write<'s, Displayed>,

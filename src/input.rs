@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use amethyst::input::{BindingTypes, Bindings};
+use amethyst::input::BindingTypes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
