@@ -108,7 +108,19 @@ pub fn bishop_movements(
     color: ChessColor,
     all_pieces: &HashMap<Vector2<i32>, ChessColor>,
 ) -> HashSet<Vector2<i32>> {
-    let movements = HashSet::new();
+    let mut movements = HashSet::new();
+
+    movements.extend(
+        (-8..8).map(|r| pos + Vector2::new(r, r)).filter(|p| {
+            *p != pos && in_board(p) && empty_between(pos, *p, all_pieces, true, false)
+        }),
+    );
+    movements.extend(
+        (-8..8).map(|r| pos + Vector2::new(r, -r)).filter(|p| {
+            *p != pos && in_board(p) && empty_between(pos, *p, all_pieces, true, false)
+        }),
+    );
+
     movements
 }
 
