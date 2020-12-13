@@ -129,8 +129,10 @@ pub fn queen_movements(
     color: ChessColor,
     all_pieces: &HashMap<Vector2<i32>, ChessColor>,
 ) -> HashSet<Vector2<i32>> {
-    let movements = HashSet::new();
-    movements
+    rook_movements(pos, color, all_pieces)
+        .union(&bishop_movements(pos, color, all_pieces))
+        .cloned()
+        .collect()
 }
 
 pub fn king_movements(
