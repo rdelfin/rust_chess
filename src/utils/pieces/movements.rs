@@ -42,7 +42,7 @@ pub fn pawn_movements(
             .1
             .iter()
             .cloned()
-            .filter(|p| p.y == start_row && empty_between(pos, *p, all_pieces, true, false)),
+            .filter(|p| pos.y == start_row && empty_between(pos, *p, all_pieces, true, false)),
     );
 
     // candidates.2 contains om nom nom
