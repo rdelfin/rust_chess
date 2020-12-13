@@ -87,8 +87,20 @@ pub fn horse_movements(
     color: ChessColor,
     all_pieces: &HashMap<Vector2<i32>, ChessColor>,
 ) -> HashSet<Vector2<i32>> {
-    let movements = HashSet::new();
-    movements
+    [
+        (2, 1),
+        (1, 2),
+        (2, -1),
+        (1, -2),
+        (-2, -1),
+        (-1, -2),
+        (-2, 1),
+        (-1, 2),
+    ]
+    .iter()
+    .map(|p| pos + Vector2::new(p.0, p.1))
+    .filter(|p| in_board(p) && (!all_pieces.contains_key(p) || all_pieces[p] != color))
+    .collect()
 }
 
 pub fn bishop_movements(
@@ -148,4 +160,8 @@ fn empty_between(
     };
 
     tiles.into_iter().all(|t| !all_pieces.contains_key(&t))
+}
+
+fn in_board(pos: &Vector2<i32>) -> bool {
+    pos.x >= 0 && pos.x < 8 && pos.y >= 0 && pos.y < 8
 }
