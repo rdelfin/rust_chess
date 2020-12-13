@@ -5,13 +5,15 @@ use crate::{
 use amethyst::{
     core::Transform,
     ecs::{Entities, Entity, LazyUpdate},
+    prelude::*,
     renderer::{SpriteRender, Transparent},
 };
+use anyhow::Result;
 use nalgebra::Vector2;
 
 pub fn fill_potential_move(
     entities: &Entities<'_>,
-    update: &LazyUpdate,
+    updater: &LazyUpdate,
     sprite_cache: &SpriteCache,
     pos: Vector2<i32>,
 ) -> Result<Entity> {
@@ -20,6 +22,7 @@ pub fn fill_potential_move(
     Ok(updater
         .create_entity(entities)
         .with(Transform::default())
+        .with(Position(Vector2::new(0., 0.)))
         .with(Transparent)
         .with(SpriteRender {
             sprite_sheet: piece_handle,
