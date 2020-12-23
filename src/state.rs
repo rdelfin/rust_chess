@@ -12,7 +12,6 @@ use amethyst::{
 };
 use anyhow::Result;
 
-/// A dummy game state that shows 3 sprites.
 pub struct GameState;
 
 impl SimpleState for GameState {
