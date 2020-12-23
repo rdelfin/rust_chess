@@ -10,6 +10,7 @@ use amethyst::{
     ecs::{Entities, ReadStorage, System, Write, WriteStorage},
 };
 use nalgebra::Vector2;
+use std::collections::HashSet;
 
 #[derive(SystemDesc)]
 pub struct PiecePlacementSystem;
@@ -68,10 +69,11 @@ impl<'s> System<'s> for MovementSystem {
         ): Self::SystemData,
     ) {
         if let Some(s) = selected.0 {
-            let piece_info = piece_infos
-                .join()
-                .get(piece_positioning.map[&s], &entities)
-                .unwrap();
+            let piece_info = match piece_positioning.map.get(&s) {
+                Some(position) => piece_infos.join().get(*position, &entities),
+                None => None,
+            };
+
             let mut piece_infos_join = piece_infos.join();
             let colour_mappings = piece_positioning
                 .map
@@ -83,7 +85,10 @@ impl<'s> System<'s> for MovementSystem {
                     )
                 })
                 .collect();
-            let valid_moves = valid_piece_movements(s, piece_info.piece, &colour_mappings);
+            let valid_moves = match piece_info {
+                Some(piece_info) => valid_piece_movements(s, piece_info.piece, &colour_mappings),
+                None => HashSet::new(),
+            };
 
             displayed.0 = match displayed.0 {
                 Some(_) => {
