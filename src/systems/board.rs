@@ -50,6 +50,7 @@ impl<'s> System<'s> for MovementSystem {
         Read<'s, PiecePositioning>,
         ReadStorage<'s, ChessPieceInfo>,
         ReadStorage<'s, PotentialMovement>,
+        WriteStorage<'s, PiecePlacement>,
         Entities<'s>,
         Read<'s, LazyUpdate>,
         Read<'s, SpriteCache>,
@@ -63,17 +64,27 @@ impl<'s> System<'s> for MovementSystem {
             piece_positioning,
             piece_infos,
             potential_movements,
+            mut piece_placements,
             entities,
             lazy_update,
             sprite_cache,
         ): Self::SystemData,
     ) {
+        // There's two resources, selected and displayed. The former denotes a piece
+        // that we just clicked on. The latter denotes a piece that we're currently
+        // showing the valid positions of.
+        //
+        // We only act when selected is Some(_), and depending on whether we have a
+        // piece already displayed we choose whether to display potential moves, move
+        // the piece, or do nothing
+
         if let Some(s) = selected.0 {
             let piece_info = match piece_positioning.map.get(&s) {
                 Some(position) => piece_infos.join().get(*position, &entities),
                 None => None,
             };
 
+            // Creates a map from piece positions to color of the piece
             let mut piece_infos_join = piece_infos.join();
             let colour_mappings = piece_positioning
                 .map
@@ -85,21 +96,49 @@ impl<'s> System<'s> for MovementSystem {
                     )
                 })
                 .collect();
-            let valid_moves = match piece_info {
-                Some(piece_info) => valid_piece_movements(s, piece_info.piece, &colour_mappings),
-                None => HashSet::new(),
-            };
 
             displayed.0 = match displayed.0 {
-                Some(_) => {
+                // If we're already displaying a piece, move the piece (if a valid
+                // movement is selected) and clear out the displayed potential moves.
+                Some(d) => {
+                    // We need to compute the current position first
+                    let displayed_position = piece_placements.get(d).unwrap().0;
+
+                    // This computes the valid movements for the *displayed* piece
+                    let valid_moves = match piece_infos.join().get(d, &entities) {
+                        Some(piece_info) => valid_piece_movements(
+                            displayed_position,
+                            piece_info.piece,
+                            &colour_mappings,
+                        ),
+                        None => HashSet::new(),
+                    };
+
+                    // If we selected a valid move for the piece being displayed, move
+                    // it
+                    if valid_moves.contains(&s) {
+                        if let Some(placement) = piece_placements.get_mut(d) {
+                            placement.0 = s;
+                        }
+                    }
+
                     for (_, entity) in (&potential_movements, &entities).join() {
                         entities.delete(entity).unwrap();
                     }
                     None
                 }
+
+                // If we're not displaying anything, try to display the valid moves for
+                // the current piece
                 None => {
-                    // If we're not already showing a move, add the selected piece's potential
-                    // moves
+                    // The relevant valid moves
+                    let valid_moves = match piece_info {
+                        Some(piece_info) => {
+                            valid_piece_movements(s, piece_info.piece, &colour_mappings)
+                        }
+                        None => HashSet::new(),
+                    };
+
                     for movement in valid_moves {
                         display_entities::fill_potential_move(
                             &entities,
