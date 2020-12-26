@@ -1,7 +1,10 @@
 mod movements;
 
 use nalgebra::Vector2;
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Not,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ChessPiece {
@@ -22,6 +25,17 @@ pub enum ChessColor {
 impl Default for ChessColor {
     fn default() -> Self {
         ChessColor::White
+    }
+}
+
+impl Not for ChessColor {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            ChessColor::White => ChessColor::Black,
+            ChessColor::Black => ChessColor::White,
+        }
     }
 }
 
