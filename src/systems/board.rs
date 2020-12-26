@@ -1,7 +1,7 @@
 use crate::{
     components::{ChessPieceInfo, PiecePlacement, Position, PotentialMovement},
     entities::display as display_entities,
-    resources::{Displayed, PiecePositioning, Selected, SpriteCache},
+    resources::{Displayed, PiecePositioning, Play, Selected, SpriteCache},
     utils::valid_piece_movements,
 };
 use amethyst::{
@@ -47,6 +47,7 @@ impl<'s> System<'s> for MovementSystem {
     type SystemData = (
         Write<'s, Selected>,
         Write<'s, Displayed>,
+        Write<'s, Play>,
         Read<'s, PiecePositioning>,
         ReadStorage<'s, ChessPieceInfo>,
         ReadStorage<'s, PotentialMovement>,
@@ -61,6 +62,7 @@ impl<'s> System<'s> for MovementSystem {
         (
             mut selected,
             mut displayed,
+            mut play,
             piece_positioning,
             piece_infos,
             potential_movements,
@@ -115,7 +117,7 @@ impl<'s> System<'s> for MovementSystem {
                     };
 
                     // If we selected a valid move for the piece being displayed, move
-                    // it
+                    // it and switch colours
                     if valid_moves.contains(&s) {
                         if let Some(placement) = piece_placements.get_mut(d) {
                             placement.0 = s;
@@ -125,6 +127,8 @@ impl<'s> System<'s> for MovementSystem {
                                 entities.delete(*piece).unwrap();
                             }
                         }
+
+                        play.turn = !play.turn;
                     }
 
                     // Clear out the displayed red squares
@@ -137,24 +141,33 @@ impl<'s> System<'s> for MovementSystem {
                 // If we're not displaying anything, try to display the valid moves for
                 // the current piece
                 None => {
-                    // The relevant valid moves
-                    let valid_moves = match piece_info {
-                        Some(piece_info) => {
-                            valid_piece_movements(s, piece_info.piece, &colour_mappings)
-                        }
-                        None => HashSet::new(),
-                    };
+                    // Only allow movement from current colour
+                    if let Some(selected_colour) = colour_mappings.get(&s) {
+                        if *selected_colour == play.turn {
+                            // The relevant valid moves
+                            let valid_moves = match piece_info {
+                                Some(piece_info) => {
+                                    valid_piece_movements(s, piece_info.piece, &colour_mappings)
+                                }
+                                None => HashSet::new(),
+                            };
 
-                    for movement in valid_moves {
-                        display_entities::fill_potential_move(
-                            &entities,
-                            &lazy_update,
-                            &sprite_cache,
-                            movement,
-                        )
-                        .unwrap();
+                            for movement in valid_moves {
+                                display_entities::fill_potential_move(
+                                    &entities,
+                                    &lazy_update,
+                                    &sprite_cache,
+                                    movement,
+                                )
+                                .unwrap();
+                            }
+                            piece_positioning.map.get(&s).cloned()
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
                     }
-                    piece_positioning.map.get(&s).cloned()
                 }
             };
         }
