@@ -84,7 +84,7 @@ impl<'s> System<'s> for MovementSystem {
                 None => None,
             };
 
-            // Creates a map from piece positions to color of the piece
+            // Creates a map from piece positions to colour of the piece
             let mut piece_infos_join = piece_infos.join();
             let colour_mappings = piece_positioning
                 .map
@@ -119,9 +119,15 @@ impl<'s> System<'s> for MovementSystem {
                     if valid_moves.contains(&s) {
                         if let Some(placement) = piece_placements.get_mut(d) {
                             placement.0 = s;
+
+                            // Finally, remove pieces you "ate"
+                            if let Some(piece) = piece_positioning.map.get(&s) {
+                                entities.delete(*piece).unwrap();
+                            }
                         }
                     }
 
+                    // Clear out the displayed red squares
                     for (_, entity) in (&potential_movements, &entities).join() {
                         entities.delete(entity).unwrap();
                     }
