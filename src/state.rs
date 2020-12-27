@@ -11,6 +11,7 @@ use amethyst::{
     window::ScreenDimensions,
 };
 use anyhow::Result;
+use nalgebra::Vector3;
 
 pub struct GameState;
 
@@ -57,7 +58,7 @@ impl GameState {
         let mut transform = Transform::default();
         //transform.set_translation_xyz(dimensions.width() * 0.5, dimensions.height() * 0.5, 1.);
         transform.set_translation_xyz(0., 0., 1.);
-        //transform.set_scale(Vector3::new(0.2, 0.2, 1.));
+        transform.set_scale(Vector3::new(0.5, 0.5, 0.5));
 
         world
             .create_entity()
